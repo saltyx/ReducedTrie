@@ -1,16 +1,19 @@
-# An efficient implement of trie structure 
-> based on double array trie
+# 一种字典树的高效实现
 
-### Project structure
+## 概要
 
+- 根据《An Efficient Implementation of Trie Structures》 论文实现
 
-- main source file
+## 和双数组字典数组不同
+- 增加tail数组存储非前缀部分
+- base check数组更加精简
 
-    /src/Trie/Trie.java
-    
-### 4 files in the data folder
+## 实现
+- 字典树构建
+- 根据前缀查找单词
+- 存储到文件(save)和从文件加载(reload)
 
-- ***.bc** stores the base and check array
-- ***.tail** stores the tail array
-- ***.index** stores the indexes and sizes of list that is not null
-- ***.list** stores the value of lists
+## 项目结构
+- _data文件夹_ 存储字典树的四个文件(*.bc, *tail, *index, *list)
+- _src文件夹_ 字典树源程序
+- _test文件夹_ 测试字典
