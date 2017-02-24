@@ -4,7 +4,7 @@
 
 - 根据《An Efficient Implementation of Trie Structures》 论文实现
 
-## 和双数组字典数组不同
+## 和双数组字典树的不同
 - 增加tail数组存储非前缀部分
 - base check数组更加精简
 - [详细请看博客，点击这里](https://saltyx.github.io/2017/02/20/An-Efficient-Implementation-of-Trie-Structures/)
