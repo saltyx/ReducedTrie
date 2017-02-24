@@ -338,9 +338,13 @@ public class Trie {
         }
         for (int i = 0; i < lists[pre].size(); i++) {
             next = base[pre] + lists[pre].get(i);
-            StringBuilder reserved = new StringBuilder(builder);
+            StringBuilder reserved = new StringBuilder(builder.toString());
             if (check[next] == pre) {
-                find(next, builder.append((char) lists[pre].get(i).intValue()), list);
+                if (lists[pre].get(i) == 1) {
+                    find(next, builder, list);
+                } else {
+                    find(next, builder.append((char) lists[pre].get(i).intValue()), list);
+                }
             }
             builder = reserved;
         }
