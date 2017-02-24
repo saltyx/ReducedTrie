@@ -31,6 +31,26 @@ public class Test {
                     long end = System.currentTimeMillis();
                     info("Reduced Trie has been built");
                     info(String.format("Time Used: %d ms", end-start));
+
+                    info("=============saving trie==============");
+                    trie.save("./data/test");
+                    info("trie has been saved in test");
+
+                    info("=============reload trie==============");
+                    trie.load("./data/test");
+                    info("trie has been loaded from test");
+
+                    info("=============insert test==============");
+                    Scanner in = new Scanner(System.in);
+                    while (in.hasNext()) {
+                        String str = in.next();
+                        if (str.contentEquals("exit")) break;
+                        trie.insert(str);
+                        if (trie.search(str)) {
+                            hint(str+" pass");
+                        }
+                    }
+
                     info("Running all test cases");
                     int passed = 0, failed = 0;
                     long start1 = System.currentTimeMillis();
@@ -53,9 +73,9 @@ public class Test {
 
                     info("=============prefix test result==============");
 
-                    Scanner in = new Scanner(System.in);
-                    while (in.hasNext()) {
-                        String str = in.next();
+                    Scanner in1 = new Scanner(System.in);
+                    while (in1.hasNext()) {
+                        String str = in1.next();
                         if (str.contentEquals("exit")) break;
                         List<String> list1 = trie.findByPrefix(str);
                         if (list1 != null) {

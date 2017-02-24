@@ -1,5 +1,6 @@
 package Trie;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -10,6 +11,8 @@ import java.util.*;
 
 public class Trie {
 
+    private static int BC_UNIT_SIZE = 8; // INT + INT
+    private static int UNIT_SIZE = 4;// INT
     private static int DEFAULT_SIZE = 4096 * 32;
     private static int DEFAULT_TAIL_SIZE = 4096;
     private static int END_FLAG = 1;
@@ -28,6 +31,66 @@ public class Trie {
 
     public Trie(int... size) {
         initial(size);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void load(String filename) throws IOException {
+
+        base = check = tail = null;
+        lists = null;
+        position = 1;
+
+        File bcFile = new File(filename+".bc");
+        int size = (int) bcFile.length() / BC_UNIT_SIZE;
+        base = new int[size];
+        check = new int[size];
+        lists = new List[size];
+
+        DataInputStream bcDataInputStream = new DataInputStream(
+                new BufferedInputStream(
+                        new FileInputStream(bcFile)));
+        for (int i = 0; i < size; i++) {
+            base[i] = bcDataInputStream.readInt();
+            check[i] = bcDataInputStream.readInt();
+        }
+        bcDataInputStream.close();
+
+        File tailFile = new File(filename + ".tail");
+        DataInputStream tailDataInputStream = new DataInputStream(
+                new BufferedInputStream(
+                        new FileInputStream(tailFile)));
+        int tailSize = (int) tailFile.length() / UNIT_SIZE;
+        tail = new int[tailSize];
+        for (int i = 0; i < tailSize; i++) {
+            tail[i] = tailDataInputStream.readInt();
+            if (tail[i] != 0) {
+                position = i;
+            }
+        }
+        position++;
+        tailDataInputStream.close();
+
+        File indexFile = new File(filename + ".index");
+        DataInputStream indexDataInputStream = new DataInputStream(
+                new BufferedInputStream(
+                        new FileInputStream(indexFile)));
+
+        File listFile = new File(filename + ".list");
+        DataInputStream listDataInputStream = new DataInputStream(
+                new BufferedInputStream(
+                        new FileInputStream(listFile)));
+
+        int indexSize = (int) indexFile.length() / BC_UNIT_SIZE;
+        for (int i = 0; i < indexSize; i++) {
+            int index = indexDataInputStream.readInt();
+            int num = indexDataInputStream.readInt();
+            lists[index] = new LinkedList<>();
+            for (int j = 0; j < num; j++) {
+                lists[index].add(listDataInputStream.readInt());
+            }
+        }
+        indexDataInputStream.close();
+        listDataInputStream.close();
     }
 
     @SuppressWarnings("unchecked")
@@ -65,6 +128,46 @@ public class Trie {
         base[1] = 1;
         check[1] = 1;
         position = 1;
+    }
+
+    public void save(String filename) throws IOException {
+
+        DataOutputStream dataOutputStreamForBC = new DataOutputStream(
+                new BufferedOutputStream(
+                        new FileOutputStream(filename+".bc")));
+        for (int i = 0; i < base.length; i++) {
+            dataOutputStreamForBC.writeInt(base[i]);
+            dataOutputStreamForBC.writeInt(check[i]);
+        }
+        dataOutputStreamForBC.close();
+
+        DataOutputStream dataOutputStreamForTail = new DataOutputStream(
+                new BufferedOutputStream(
+                        new FileOutputStream(filename + ".tail")));
+        for (int x: tail) {
+            dataOutputStreamForTail.writeInt(x);
+        }
+        dataOutputStreamForTail.close();
+
+        DataOutputStream dataOutputStreamForIndex = new DataOutputStream(
+                new BufferedOutputStream(
+                        new FileOutputStream(filename + ".index")));
+        DataOutputStream dataOutputStreamForList =  new DataOutputStream(
+                new BufferedOutputStream(
+                        new FileOutputStream(filename + ".list")));
+
+        for (int i = 0; i < lists.length; i++) {
+            if (lists[i] != null) {
+                dataOutputStreamForIndex.writeInt(i);
+                dataOutputStreamForIndex.writeInt(lists[i].size());
+                for (int x: lists[i]) {
+                    dataOutputStreamForList.writeInt(x);
+                }
+            }
+        }
+
+        dataOutputStreamForList.close();
+        dataOutputStreamForIndex.close();
     }
 
     public void build(List<String> list) {
