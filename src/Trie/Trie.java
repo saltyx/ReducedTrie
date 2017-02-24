@@ -340,7 +340,7 @@ public class Trie {
             next = base[pre] + lists[pre].get(i);
             StringBuilder reserved = new StringBuilder(builder.toString());
             if (check[next] == pre) {
-                if (lists[pre].get(i) == 1) {
+                if (lists[pre].get(i) == END_FLAG) {
                     find(next, builder, list);
                 } else {
                     find(next, builder.append((char) lists[pre].get(i).intValue()), list);
