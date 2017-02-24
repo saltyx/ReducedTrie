@@ -7,6 +7,7 @@
 ## 和双数组字典数组不同
 - 增加tail数组存储非前缀部分
 - base check数组更加精简
+- [详细请看博客，点击这里](https://saltyx.github.io/2017/02/20/An-Efficient-Implementation-of-Trie-Structures/)
 
 ## 实现
 - 字典树构建
@@ -17,3 +18,4 @@
 - _data文件夹_ 存储字典树的四个文件(*.bc, *tail, *index, *list)
 - _src文件夹_ 字典树源程序
 - _test文件夹_ 测试字典
+
