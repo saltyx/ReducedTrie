@@ -201,8 +201,8 @@ public class Trie {
                     int oldBase = base[pre];
                     if (tail[-oldBase] == keyValue[i]) {
                         //create a new node
-                        base[pre] = xCheck(keyValue[i]);
-
+                        int q = xCheck(keyValue[i]);
+                        base[pre] = q;
                         checkBC(base[pre] + keyValue[i]);
                         base[ base[pre]+keyValue[i] ] = oldBase;
                         check[ base[pre]+keyValue[i] ] = pre;
@@ -213,7 +213,8 @@ public class Trie {
                         //separate
                         List<Integer> list = new ArrayList<>();
                         list.add(tail[-oldBase]); list.add(keyValue[i]);
-                        base[pre] = xCheck(list);
+                        int q = xCheck(list);
+                        base[pre] = q;
                         checkBC(base[pre] + tail[-oldBase]);
                         checkBC(base[pre] + keyValue[i]);
                         base[ base[pre]+tail[-oldBase] ] = oldBase;
@@ -464,6 +465,7 @@ public class Trie {
     private int xCheck(int x) {
         int q = 1;
         while (true) {
+            checkBC(q+x);
             if (check[q+x] != 0) {
                 q++;
             } else {
@@ -477,6 +479,7 @@ public class Trie {
         int q = 1;
         findQ:while (true) {
             for (int i = 0; i < list.size(); i++) {
+                checkBC(q+list.get(i));
                 if (check[q+list.get(i)] != 0) {
                     q++;
                     continue findQ;

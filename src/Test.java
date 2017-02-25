@@ -77,9 +77,12 @@ public class Test {
                     while (in1.hasNext()) {
                         String str = in1.next();
                         if (str.contentEquals("exit")) break;
+                        long beginPrefixTime = System.currentTimeMillis();
                         List<String> list1 = trie.findByPrefix(str);
+                        long endPrefixTime = System.currentTimeMillis();
                         if (list1 != null) {
                             list1.forEach(Test::hint);
+                            hint(String.format("Total: %d, Time Used: %d ms", list1.size(), endPrefixTime-beginPrefixTime));
                         } else {
                             info("no hint");
                         }
