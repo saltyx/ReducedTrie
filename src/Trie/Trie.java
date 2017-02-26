@@ -13,8 +13,8 @@ public class Trie {
 
     private static int BC_UNIT_SIZE = 8; // INT + INT
     private static int UNIT_SIZE = 4;// INT
-    private static int DEFAULT_SIZE = 4096 * 32;
-    private static int DEFAULT_TAIL_SIZE = 4096;
+    private static int DEFAULT_SIZE = 65536;
+    private static int DEFAULT_TAIL_SIZE = 65536*5;
     private static int END_FLAG = 1;
     private static int DEBUG_MODE = 0;
 
@@ -215,8 +215,7 @@ public class Trie {
                         list.add(tail[-oldBase]); list.add(keyValue[i]);
                         int q = xCheck(list);
                         base[pre] = q;
-                        checkBC(base[pre] + tail[-oldBase]);
-                        checkBC(base[pre] + keyValue[i]);
+                        checkBC(Math.max(base[pre] + tail[-oldBase],base[pre] + keyValue[i]));
                         base[ base[pre]+tail[-oldBase] ] = oldBase;
                         base[ base[pre]+keyValue[i] ] = -position;
                         check[ base[pre]+tail[-oldBase] ] = check[ base[pre]+keyValue[i] ] = pre;
@@ -227,6 +226,7 @@ public class Trie {
                         break;// 2 new nodes
                     }
                 } else if (base[pre] > 0) {
+                    checkBC(base[pre] + keyValue[i]);
                     if (check[ base[pre] + keyValue[i] ] == 0) {
                         check[ base[pre] + keyValue[i] ] = pre;
                         base[ base[pre] + keyValue[i] ] = -position;
@@ -265,9 +265,11 @@ public class Trie {
             check[newNext] = node;
             if (base[oldNext] > 0) {
                 for (int j = 0; j < lists[oldNext].size(); j++) {
-                    check[ base[oldNext] + lists[oldNext].get(j) ] = newNext;
-                    put(newNext, lists[oldNext].get(j));
+                    int temp = lists[oldNext].get(j); lists[oldNext].set(j, null);
+                    check[ base[oldNext] + temp ] = newNext;
+                    put(newNext, temp);
                 }
+                lists[oldNext].clear();
                 lists[oldNext] = null;
             }
             base[oldNext] = 0; check[oldNext] = 0;
@@ -280,31 +282,35 @@ public class Trie {
 
     private void checkBC(int p) {
         if (p >= base.length) {
-            extendBC();
+            extendBC(p);
         }
     }
 
     private void checkTail(int p) {
         if (p >= tail.length) {
-            extendT();
+            extendT(p);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void extendBC() {
-        int[] base1 = new int[base.length + DEFAULT_SIZE];
-        int[] check1 = new int[check.length + DEFAULT_SIZE];
-        List<Integer>[] lists1 = new List[lists.length + DEFAULT_SIZE];
-        System.arraycopy(base, 0, base1, 0, base.length);
-        System.arraycopy(check, 0, check1, 0, check.length);
-        System.arraycopy(lists, 0, lists1, 0, lists.length);
+    private void extendBC(int p) {
+        info(String.format("extend base and check @%d", p));
+        int newSize = p+DEFAULT_SIZE;
+        int[] base1 =  new int[newSize];
+        int[] check1 = new int[newSize];
+        List<Integer>[] lists1 = new List[newSize];
+        int len = base.length;
+        System.arraycopy(base, 0, base1, 0,   len);
+        System.arraycopy(check, 0, check1, 0, len);
+        System.arraycopy(lists, 0, lists1, 0, len);
         base = base1;
         check = check1;
         lists = lists1;
     }
 
-    private void extendT() {
-        int[] tail1 = new int[tail.length + DEFAULT_TAIL_SIZE];
+    private void extendT(int p) {
+        info(String.format("extend tail @%d", p));
+        int[] tail1 = new int[p*13/10];
         System.arraycopy(tail, 0, tail1, 0 ,tail.length);
         tail = tail1;
     }
@@ -314,8 +320,7 @@ public class Trie {
         for (int i = 0; i < key.length; i++) {
             if (base[pre] < 0) {
                 return compareTail(-base[pre], i, key);
-            } else if (base[pre] > 0) {
-                checkBC(base[pre]+key[i]);
+            } else if (base[pre] > 0 && (base[pre] + key[i] < base.length) ) {
                 if (check[ base[pre] + key[i] ] == pre) {
                     pre = base[pre] + key[i];
                 } else {
@@ -456,7 +461,7 @@ public class Trie {
 
     private String readTail(int start) {
         StringBuilder builder = new StringBuilder();
-        while (tail[start] != END_FLAG) {
+        while (tail[start] != END_FLAG && tail[start] != 0) {
             builder.append((char) tail[start++]);
         }
         return builder.toString();
@@ -494,6 +499,7 @@ public class Trie {
         int q = 1;
         findQ:while (true) {
             for (int i = 0; i < list.size(); i++) {
+                checkBC(Math.max(q+list.get(i), q+x));
                 if (check[q+list.get(i)] != 0 || check[q+x] != 0) {
                     q++;
                     continue findQ;
@@ -515,7 +521,7 @@ public class Trie {
     @SuppressWarnings("unchecked")
     private void put(int key, int value) {
         if (lists[key] == null) {
-            lists[key] = new LinkedList();
+            lists[key] = new LinkedList<>();
             lists[key].add(value);
         } else {
             lists[key].add(value);
