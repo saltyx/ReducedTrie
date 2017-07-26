@@ -7,7 +7,7 @@
 ## 和双数组字典树的不同
 - 增加tail数组存储非前缀部分
 - base check数组更加精简
-- [详细请看博客，点击这里](https://saltyx.github.io/2017/02/20/An-Efficient-Implementation-of-Trie-Structures/)
+- [详细请看博客，点击这里](https://saltyx.github.io/2017/02/21/An-Efficient-Implementation-of-Trie-Structures/)
 
 ## 实现
 - 字典树构建
